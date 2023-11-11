@@ -1,10 +1,5 @@
 db:
-  host: "localhost"
-  port: "5434"
-  username: "postgres"
-  password: "psychopass2023"
-  dbname: "postgres"
-  sslmode: "disable"
+  dbname: "sqlite3"
 
 app:
   port: "8083"

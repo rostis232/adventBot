@@ -1,17 +1,24 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
-	"github.com/rostis232/adventBot/internal/repository"
+	"github.com/rostis232/adventBot/internal/pkg/app"
+	"github.com/spf13/viper"
 )
 
 func main(){
-	db, err := repository.NewSQLiteDB("sqlite3.db")
+	if err := initConfig(); err != nil {
+		log.Fatalln("error while config loading")
+	  }
+	_, err := app.NewApp(viper.GetString("db.dbname"))
 	if err != nil {
-		fmt.Println("Помилка!", err)
-	} else {
-		fmt.Println("Ok!")
+		log.Fatal(err)
 	}
-	db.Close()
+}
+
+func initConfig() error {
+	viper.AddConfigPath("config")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }
