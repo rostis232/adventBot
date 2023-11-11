@@ -11,10 +11,11 @@ func main(){
 	if err := initConfig(); err != nil {
 		log.Fatalln("error while config loading")
 	  }
-	_, err := app.NewApp(viper.GetString("db.dbname"))
+	a, err := app.NewApp(viper.GetString("db.dbname"))
 	if err != nil {
 		log.Fatal(err)
 	}
+	a.Run(viper.GetString("app.port"))
 }
 
 func initConfig() error {

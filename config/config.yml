@@ -3,6 +3,6 @@ db:
 
 app:
   port: "8083"
-  tg_secretkey: "Bw29-awAW/wddd2a.4aw"
+  tg_secretkey: ""
   admin_login: "mariia_admin"
   admin_pass: "21062006m1m2"
