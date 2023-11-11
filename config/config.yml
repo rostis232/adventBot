@@ -1,0 +1,13 @@
+db:
+  host: "localhost"
+  port: "5434"
+  username: "postgres"
+  password: "psychopass2023"
+  dbname: "postgres"
+  sslmode: "disable"
+
+app:
+  port: "8083"
+  tg_secretkey: "Bw29-awAW/wddd2a.4aw"
+  admin_login: "mariia_admin"
+  admin_pass: "21062006m1m2"
