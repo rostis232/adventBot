@@ -1,8 +1,0 @@
-db:
-  dbname: "sqlite3"
-
-app:
-  port: "8083"
-  tg_secretkey: ""
-  admin_login: "mariia_admin"
-  admin_pass: "21062006m1m2"
