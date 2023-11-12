@@ -8,6 +8,7 @@ import (
 	"github.com/rostis232/adventBot/internal/renderer"
 	"github.com/rostis232/adventBot/internal/repository"
 	"github.com/rostis232/adventBot/internal/service"
+	"github.com/rostis232/adventBot/internal/telegram"
 )
 
 type App struct {
@@ -16,6 +17,7 @@ type App struct {
 	service *service.Service
 	handler *handler.Handler
 	echo *echo.Echo
+	bot *telegram.Bot
 }
 
 func NewApp (config *config.Config) (*App, error) {
@@ -42,10 +44,15 @@ func NewApp (config *config.Config) (*App, error) {
 	//Make Routes
 	app.echo.GET("/", app.handler.Home)
 
+	bot := telegram.NewBot(config.TGsecretCode)
+	app.bot = bot
+
 	return app, nil
 }
 
 func (a *App) Run() {
 	// Start server
+	go a.bot.ListenTelegram()
+	go a.bot.SendMessages()
 	a.echo.Logger.Fatal(a.echo.Start(":"+a.config.Port))
 }
