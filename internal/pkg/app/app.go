@@ -44,7 +44,7 @@ func NewApp (config *config.Config) (*App, error) {
 	//Make Routes
 	app.echo.GET("/", app.handler.Home)
 
-	bot := telegram.NewBot(config.TGsecretCode)
+	bot := telegram.NewBot(config.TGsecretCode, app.config, app.repo)
 	app.bot = bot
 
 	return app, nil

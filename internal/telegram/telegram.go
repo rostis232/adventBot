@@ -4,6 +4,8 @@ import (
 	"log"
 
 	"github.com/mymmrac/telego"
+	"github.com/rostis232/adventBot/config"
+	"github.com/rostis232/adventBot/internal/repository"
 )
 
 type Bot struct {
@@ -12,7 +14,7 @@ type Bot struct {
 	botService *BotService
 }
 
-func NewBot(token string) *Bot {
+func NewBot(token string, config *config.Config, repo *repository.Repository) *Bot {
 	tg := &Bot{}
 	bot, err := telego.NewBot(token, telego.WithWarnings())
 	if err != nil {
@@ -20,7 +22,7 @@ func NewBot(token string) *Bot {
 	}
 	tg.tgBot = bot
 	tg.msgChan = make(chan telego.SendMessageParams)
-	tg.botService = NewBotService(tg.msgChan)
+	tg.botService = NewBotService(tg.msgChan, config, repo)
 	return tg
 }
 
@@ -32,7 +34,7 @@ func (b *Bot) ListenTelegram() {
 	
 	for update := range updates {
 		if update.Message != nil {
-			b.botService.CostructMessage(update.Message)
+			b.botService.BotRouter(update.Message)
 		}
 	}
 }
