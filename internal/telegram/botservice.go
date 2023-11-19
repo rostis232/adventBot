@@ -25,6 +25,7 @@ func NewBotService (msgChan chan telego.SendMessageParams, config *config.Config
 }
 
 func (s *BotService) BotRouter(received *telego.Message) {
+	fmt.Println(received.Text)
 	//Get info about chatID from DB
 	costumer, err := s.Repo.GetCostumerByChatID(int(received.Chat.ID))
 	switch {

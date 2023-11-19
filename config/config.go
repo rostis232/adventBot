@@ -2,6 +2,7 @@ package config
 
 type Config struct {
 	DBname string
+	RedisAddress string
 	Port string
 	TGsecretCode string
 	AdminLogin string

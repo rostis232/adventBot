@@ -1,3 +1,6 @@
 .vscode
 *.db
 config.yml
+.fleet
+.idea
+db-data

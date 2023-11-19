@@ -8,7 +8,9 @@ import (
 	"github.com/rostis232/adventBot/internal/renderer"
 	"github.com/rostis232/adventBot/internal/repository"
 	"github.com/rostis232/adventBot/internal/service"
+	"github.com/rostis232/adventBot/internal/sessions"
 	"github.com/rostis232/adventBot/internal/telegram"
+	session "github.com/spazzymoto/echo-scs-session"
 )
 
 type App struct {
@@ -18,6 +20,7 @@ type App struct {
 	handler *handler.Handler
 	echo *echo.Echo
 	bot *telegram.Bot
+	session *sessions.Sessions
 }
 
 func NewApp (config *config.Config) (*App, error) {
@@ -27,13 +30,15 @@ func NewApp (config *config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	sess := sessions.NewSessions(app.config.RedisAddress)
 	repo := repository.NewRepository(db)
-	service := service.NewService(repo)
-	handler := handler.NewHandler(app.config, service)
+	srvs := service.NewService(repo)
+	hdl := handler.NewHandler(app.config, srvs, sess)
 
 	app.repo = repo
-	app.service = service
-	app.handler = handler
+	app.service = srvs
+	app.handler = hdl
+	app.session = sess
 
 	//ECHO
 	app.echo = echo.New()
@@ -42,7 +47,11 @@ func NewApp (config *config.Config) (*App, error) {
 	app.echo.Renderer = renderer.Tmps
 
 	//Make Routes
+	app.echo.Use(session.LoadAndSave(app.session.SessionManager))
 	app.echo.GET("/", app.handler.Home)
+	app.echo.GET("/login", app.handler.Login)
+	app.echo.POST("/login", app.handler.PostLoginPage)
+	app.echo.GET("/logout", app.handler.Logout)
 
 	bot := telegram.NewBot(config.TGsecretCode, app.config, app.repo)
 	app.bot = bot

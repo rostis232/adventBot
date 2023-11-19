@@ -3,8 +3,13 @@ module github.com/rostis232/adventBot
 go 1.21.0
 
 require (
+	github.com/alexedwards/scs/redisstore v0.0.0-20231113091146-cef4b05350c8
+	github.com/alexedwards/scs/v2 v2.7.0
+	github.com/gomodule/redigo v1.8.0
 	github.com/labstack/echo/v4 v4.11.3
 	github.com/mattn/go-sqlite3 v1.14.18
+	github.com/mymmrac/telego v0.27.1
+	github.com/spazzymoto/echo-scs-session v1.0.0
 	github.com/spf13/viper v1.17.0
 )
 
@@ -21,7 +26,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/mymmrac/telego v0.27.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/sagikazarmark/locafero v0.3.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect

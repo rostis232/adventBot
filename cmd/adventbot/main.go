@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/rostis232/adventBot/config"
@@ -11,11 +10,12 @@ import (
 
 func main(){
 	if err := initConfig(); err != nil {
-		log.Fatalln("error while config loading")
+		log.Fatalln("error while cfg loading")
 	  }
 	
-	  config := &config.Config{
+	  cfg := &config.Config{
 		DBname: viper.GetString("db.dbname"),
+		RedisAddress: viper.GetString("db.redis"),
 		Port: viper.GetString("app.port"),
 		TGsecretCode: viper.GetString("app.tg_secretkey"),
 		AdminLogin: viper.GetString("app.admin_login"),
@@ -25,8 +25,7 @@ func main(){
 		TGlink: viper.GetString("app.tglink"),
 		InstaLink: viper.GetString("app.instalink"),
 	  }
-	fmt.Println("!", config.Port)
-	a, err := app.NewApp(config)
+	a, err := app.NewApp(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
