@@ -14,7 +14,31 @@ func NewRepository (db *sql.DB) *Repository{
 	return &Repository{DB: db}
 }
 
-func(r *Repository) GetAllCustumers(){}
+func(r *Repository) GetAllCustumers() ([]models.Costumer, error) {
+	query := "SELECT costumer_id, chat_id, name, status FROM costumers"
+	rows, err := r.DB.Query(query)
+	if err != nil {
+		return []models.Costumer{}, err
+	}
+	defer rows.Close()
+
+	var costumers []models.Costumer
+
+	// Читання результатів запиту
+	for rows.Next() {
+		var costumer models.Costumer
+		if err := rows.Scan(&costumer.CostumerID, &costumer.ChatID, &costumer.Name, &costumer.Status); err != nil {
+			return costumers, err
+		}
+		costumers = append(costumers, costumer)
+	}
+
+	if err := rows.Err(); err != nil {
+		return costumers, err
+	}
+
+	return costumers, nil
+}
 
 func(r *Repository) GetCostumerByChatID(chatID int) (models.Costumer, error) {
 	costumer := models.Costumer{}

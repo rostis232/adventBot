@@ -130,3 +130,12 @@ func (s *BotService) WrongSecretKey (received *telego.Message) {
 	}
 	s.MsgChan <- msg
 }
+
+func (s *BotService) SendMessageNow (chatID int, message string) {
+	msg := telego.SendMessageParams{
+		ChatID: tu.ID(int64(chatID)),
+		Text: message,
+		ParseMode: "HTML",
+	}
+	s.MsgChan <- msg
+}

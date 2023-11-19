@@ -1,16 +1,20 @@
 package handler
 
 import (
-	"github.com/rostis232/adventBot/internal/sessions"
+	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/rostis232/adventBot/internal/sessions"
 
 	"github.com/labstack/echo/v4"
 	"github.com/rostis232/adventBot/config"
 	templatedata "github.com/rostis232/adventBot/internal/template_data"
 )
 
-type Service interface{}
+type Service interface{
+	SendMessageNow (message string) error
+}
 
 type Handler struct {
 	config  *config.Config
@@ -26,9 +30,7 @@ func NewHandler(config *config.Config, service Service, session *sessions.Sessio
 }
 
 func (h *Handler) Home(c echo.Context) error {
-	data := templatedata.TemplateData{}
-	data.Config = *h.config 
-	return c.Render(http.StatusOK, "index.html", data)
+	return c.Render(http.StatusOK, "index.html", h.AddDefaultData(nil, c.Request()))
 }
 
 func (h *Handler) Login (c echo.Context) error {
@@ -40,12 +42,12 @@ func (h *Handler) PostLoginPage (c echo.Context) error {
 	login := c.FormValue("login")
 	pass := c.FormValue("password")
 	if login != h.config.AdminLogin && pass != h.config.AdminPass {
-		h.Session.SessionManager.Put(c.Request().Context(), "error", "Invalid credentials.")
+		h.Session.SessionManager.Put(c.Request().Context(), "error", "Неправильні дані.")
 		return c.Redirect(http.StatusSeeOther, "/login")
 	} else {
-		h.Session.SessionManager.Put(c.Request().Context(), "user", 1)
+		h.Session.SessionManager.Put(c.Request().Context(), "user", "1")
 
-		h.Session.SessionManager.Put(c.Request().Context(), "flash", "Successful login!")
+		h.Session.SessionManager.Put(c.Request().Context(), "flash", "Успішний вхід!")
 
 		// redirect the user
 		return c.Redirect(http.StatusSeeOther, "/login")
@@ -56,6 +58,36 @@ func (h *Handler) Logout (c echo.Context) error {
 	_ = h.Session.SessionManager.Destroy(c.Request().Context())
 	_ = h.Session.SessionManager.RenewToken(c.Request().Context())
 	return c.Redirect(http.StatusSeeOther, "/login")
+}
+
+func (h *Handler) SendPage (c echo.Context) error {
+	if h.Session.SessionManager.GetString(c.Request().Context(), "user") != "1" {
+		h.Session.SessionManager.Put(c.Request().Context(), "error", "Неправильні дані.")
+		return c.Redirect(http.StatusSeeOther, "/login")
+	} else {
+		return c.Render(http.StatusOK, "send.page.html", h.AddDefaultData(nil, c.Request())) 
+	}
+}
+
+func (h *Handler) PostSendPage (c echo.Context) error {
+	if h.Session.SessionManager.GetString(c.Request().Context(), "user") != "1" {
+		h.Session.SessionManager.Put(c.Request().Context(), "error", "Неправильні дані.")
+		return c.Redirect(http.StatusSeeOther, "/login")
+	} else {
+		message := c.FormValue("message")
+		if message == "" {
+			h.Session.SessionManager.Put(c.Request().Context(), "warning", "Повідомлення пусте.")
+			return c.Render(http.StatusOK, "send.page.html", h.AddDefaultData(nil, c.Request())) 
+		} else {
+			err := h.Service.SendMessageNow(message)
+			if err != nil {
+				h.Session.SessionManager.Put(c.Request().Context(), "error", fmt.Sprintf("Помилка надсилання: %s", err))
+				return c.Render(http.StatusOK, "send.page.html", h.AddDefaultData(nil, c.Request())) 
+			}
+			h.Session.SessionManager.Put(c.Request().Context(), "flash", "Повідомлення відправлено.")
+			return c.Render(http.StatusOK, "send.page.html", h.AddDefaultData(nil, c.Request())) 
+		}
+	}
 }
 
 func(h *Handler) AddDefaultData(td *templatedata.TemplateData, r *http.Request) *templatedata.TemplateData {

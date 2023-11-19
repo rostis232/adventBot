@@ -1,0 +1,20 @@
+{{template "base" .}}
+
+{{define "content" }}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mt-5">Відправити повідомлення зараз</h1>
+            <hr>
+            <form method="post" class="needs-validation" action="/send-page" novalidate autocomplete="off">
+                <div class="mb-3">
+                    <label for="message" class="form-label">Введіть текст повідомлення</label>
+                    <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Відправити</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{{end}}

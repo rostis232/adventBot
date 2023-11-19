@@ -26,13 +26,16 @@ type App struct {
 func NewApp (config *config.Config) (*App, error) {
 	app := &App{}
 	app.config = config
+	
 	db, err := repository.NewSQLiteDB(app.config.DBname)
 	if err != nil {
 		return nil, err
 	}
 	sess := sessions.NewSessions(app.config.RedisAddress)
 	repo := repository.NewRepository(db)
-	srvs := service.NewService(repo)
+	bot := telegram.NewBot(config.TGsecretCode, app.config, repo)
+	app.bot = bot
+	srvs := service.NewService(repo, bot)
 	hdl := handler.NewHandler(app.config, srvs, sess)
 
 	app.repo = repo
@@ -52,9 +55,10 @@ func NewApp (config *config.Config) (*App, error) {
 	app.echo.GET("/login", app.handler.Login)
 	app.echo.POST("/login", app.handler.PostLoginPage)
 	app.echo.GET("/logout", app.handler.Logout)
+	app.echo.GET("/send-page", app.handler.SendPage)
+	app.echo.POST("/send-page", app.handler.PostSendPage)
 
-	bot := telegram.NewBot(config.TGsecretCode, app.config, app.repo)
-	app.bot = bot
+	
 
 	return app, nil
 }

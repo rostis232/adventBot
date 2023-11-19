@@ -10,8 +10,8 @@ import (
 
 type Bot struct {
 	tgBot *telego.Bot
-	msgChan chan telego.SendMessageParams
-	botService *BotService
+	MsgChan chan telego.SendMessageParams
+	BotService *BotService
 }
 
 func NewBot(token string, config *config.Config, repo *repository.Repository) *Bot {
@@ -21,8 +21,8 @@ func NewBot(token string, config *config.Config, repo *repository.Repository) *B
 		log.Fatalln(err)
 	}
 	tg.tgBot = bot
-	tg.msgChan = make(chan telego.SendMessageParams)
-	tg.botService = NewBotService(tg.msgChan, config, repo)
+	tg.MsgChan = make(chan telego.SendMessageParams)
+	tg.BotService = NewBotService(tg.MsgChan, config, repo)
 	return tg
 }
 
@@ -34,13 +34,13 @@ func (b *Bot) ListenTelegram() {
 	
 	for update := range updates {
 		if update.Message != nil {
-			b.botService.BotRouter(update.Message)
+			b.BotService.BotRouter(update.Message)
 		}
 	}
 }
 
 func (b *Bot) SendMessages() {
-	for msg := range b.msgChan {
+	for msg := range b.MsgChan {
 		_, err := b.tgBot.SendMessage(&msg)
 		if err != nil {
 			log.Println(err)
