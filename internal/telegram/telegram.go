@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"log"
+	"time"
 
 	"github.com/mymmrac/telego"
 	"github.com/rostis232/adventBot/config"
@@ -45,6 +46,14 @@ func (b *Bot) SendMessages() {
 		if err != nil {
 			log.Println(err)
 		}
+	}
+	
+}
+
+func (b *Bot) CheckUnsendedMessages(dur time.Duration) {
+	for {
+		b.BotService.CheckUnsendedMessages()
+	time.Sleep(dur)
 	}
 	
 }

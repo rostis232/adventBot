@@ -12,6 +12,9 @@ type Repository interface{
 	ChangeNameAndStatusTo2(chatID int, name string) error
 	SetRelationWithSecretKey(costumerID int, secretKey string) (int, error)
 	ChangeStatusTo3(chatID int) error
+	GetAllMessages() ([]models.Message, error)
+	AddMessage(dateTime, message string) error
+	GetAllUnsendedMessages() ([]models.Message, error)
 }
 
 type Service struct{
@@ -41,4 +44,12 @@ func (s *Service) SendMessageNow (message string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) GetAllMessages() ([]models.Message, error) {
+	return s.Repo.GetAllMessages()
+}
+
+func (s *Service) AddMessage(dateTime, message string) error {
+	return s.Repo.AddMessage(dateTime, message)
 }

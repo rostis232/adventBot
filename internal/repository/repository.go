@@ -92,3 +92,73 @@ func (r *Repository) ChangeStatusTo3(chatID int) error {
 	}
 	return nil
 }
+
+func(r *Repository) GetAllMessages() ([]models.Message, error) {
+	query := "SELECT message_id, date, message, is_sent FROM messages"
+	rows, err := r.DB.Query(query)
+	if err != nil {
+		return []models.Message{}, err
+	}
+	defer rows.Close()
+
+	var messages []models.Message
+
+	// Читання результатів запиту
+	for rows.Next() {
+		var message models.Message
+		if err := rows.Scan(&message.MessageID, &message.DateTime, &message.Text, &message.Sent); err != nil {
+			return messages, err
+		}
+		messages = append(messages, message)
+	}
+
+	if err := rows.Err(); err != nil {
+		return messages, err
+	}
+
+	return messages, nil
+}
+
+func(r *Repository) AddMessage(dateTime, message string) error {
+	query := "INSERT INTO messages (date, message, is_sent) VALUES (?, ?, 0)"
+	_, err := r.DB.Exec(query, dateTime, message)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func(r *Repository) GetAllUnsendedMessages() ([]models.Message, error) {
+	query := "SELECT message_id, date, message, is_sent FROM messages WHERE is_sent = 0"
+	rows, err := r.DB.Query(query)
+	if err != nil {
+		return []models.Message{}, err
+	}
+	defer rows.Close()
+
+	var messages []models.Message
+
+	// Читання результатів запиту
+	for rows.Next() {
+		var message models.Message
+		if err := rows.Scan(&message.MessageID, &message.DateTime, &message.Text, &message.Sent); err != nil {
+			return messages, err
+		}
+		messages = append(messages, message)
+	}
+
+	if err := rows.Err(); err != nil {
+		return messages, err
+	}
+
+	return messages, nil
+}
+
+func(r *Repository) SetStatusSent(id int) error {
+	query := "UPDATE messages SET is_sent = 1 WHERE message_id = ?"
+	_, err := r.DB.Exec(query, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -3,6 +3,7 @@ package telegram
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/mymmrac/telego"
 	tu "github.com/mymmrac/telego/telegoutil"
@@ -12,15 +13,15 @@ import (
 
 type BotService struct {
 	MsgChan chan telego.SendMessageParams
-	Config *config.Config
-	Repo *repository.Repository
+	Config  *config.Config
+	Repo    *repository.Repository
 }
 
-func NewBotService (msgChan chan telego.SendMessageParams, config *config.Config, repo *repository.Repository) *BotService{
+func NewBotService(msgChan chan telego.SendMessageParams, config *config.Config, repo *repository.Repository) *BotService {
 	return &BotService{
 		MsgChan: msgChan,
-		Config: config,
-		Repo: repo,
+		Config:  config,
+		Repo:    repo,
 	}
 }
 
@@ -73,69 +74,105 @@ func (s *BotService) BotRouter(received *telego.Message) {
 		s.UndefinedMessage(received)
 	}
 
-	
 }
 
-func (s *BotService) UndefinedMessage (received *telego.Message){
+func (s *BotService) UndefinedMessage(received *telego.Message) {
 	msg := telego.SendMessageParams{
-		ChatID: tu.ID(received.Chat.ID),
-		Text: "Я можу тебе вислухати, але краще <a href=\""+s.Config.InstaLink+"\">звернись до коуча</a>!\n",
+		ChatID:           tu.ID(received.Chat.ID),
+		Text:             "Я можу тебе вислухати, але краще <a href=\"" + s.Config.InstaLink + "\">звернись до коуча</a>!\n",
 		ReplyToMessageID: received.MessageID,
+		ParseMode:        "HTML",
+	}
+	s.MsgChan <- msg
+}
+
+func (s *BotService) ErrorMessage(received *telego.Message) {
+	msg := telego.SendMessageParams{
+		ChatID:    tu.ID(received.Chat.ID),
+		Text:      "Ой, щось пішло не так, як я хотів. Скажи про це <a href=\"" + s.Config.InstaLink + "\">Марії</a>!\n",
 		ParseMode: "HTML",
 	}
 	s.MsgChan <- msg
 }
 
-func (s *BotService) ErrorMessage (received *telego.Message){
+func (s *BotService) NeedNameMessage(received *telego.Message) {
 	msg := telego.SendMessageParams{
-		ChatID: tu.ID(received.Chat.ID),
-		Text: "Ой, щось пішло не так, як я хотів. Скажи про це <a href=\""+s.Config.InstaLink+"\">Марії</a>!\n",
+		ChatID:    tu.ID(received.Chat.ID),
+		Text:      "Круто тебе тут бачити! Я адвент-календар <a href=\"" + s.Config.InstaLink + "\">коуча Марії</a>!\nЯк мені до тебе звертатись?\n",
 		ParseMode: "HTML",
 	}
 	s.MsgChan <- msg
 }
 
-func (s *BotService) NeedNameMessage (received *telego.Message){
+func (s *BotService) NeedSecretKey(received *telego.Message) {
 	msg := telego.SendMessageParams{
-		ChatID: tu.ID(received.Chat.ID),
-		Text: "Круто тебе тут бачити! Я адвент-календар <a href=\""+s.Config.InstaLink+"\">коуча Марії</a>!\nЯк мені до тебе звертатись?\n",
+		ChatID:    tu.ID(received.Chat.ID),
+		Text:      received.Text + ", радий знайомству! Якщо в тебе вже є Ключ до мене - введи його, якщо ні - звернись до <a href=\"" + s.Config.InstaLink + "\">коуча Марії</a>!\n",
 		ParseMode: "HTML",
 	}
 	s.MsgChan <- msg
 }
 
-func (s *BotService) NeedSecretKey (received *telego.Message) {
+func (s *BotService) SecretKeyAcepted(received *telego.Message) {
 	msg := telego.SendMessageParams{
-		ChatID: tu.ID(received.Chat.ID),
-		Text: received.Text+", радий знайомству! Якщо в тебе вже є Ключ до мене - введи його, якщо ні - звернись до <a href=\""+s.Config.InstaLink+"\">коуча Марії</a>!\n",
+		ChatID:    tu.ID(received.Chat.ID),
+		Text:      "Все вірно! Це маленький крок, який наблизив тебе до розуміння себе! Очікуй від мене щоденних повідомлень і обов'язково виконуй мої інструкції! В подарунок отримаєш.... себе!\n",
 		ParseMode: "HTML",
 	}
 	s.MsgChan <- msg
 }
 
-func (s *BotService) SecretKeyAcepted (received *telego.Message) {
+func (s *BotService) WrongSecretKey(received *telego.Message) {
 	msg := telego.SendMessageParams{
-		ChatID: tu.ID(received.Chat.ID),
-		Text: "Все вірно! Це маленький крок, який наблизив тебе до розуміння себе! Очікуй від мене щоденних повідомлень і обов'язково виконуй мої інструкції! В подарунок отримаєш.... себе!\n",
+		ChatID:    tu.ID(received.Chat.ID),
+		Text:      "Я подивився свої записи, але не знайшов такого ключа. Його точно правильно введено? Звернись до <a href=\"" + s.Config.InstaLink + "\">коуча Марії</a>!\n",
 		ParseMode: "HTML",
 	}
 	s.MsgChan <- msg
 }
 
-func (s *BotService) WrongSecretKey (received *telego.Message) {
+func (s *BotService) SendMessageNow(chatID int, message string) {
 	msg := telego.SendMessageParams{
-		ChatID: tu.ID(received.Chat.ID),
-		Text: "Я подивився свої записи, але не знайшов такого ключа. Його точно правильно введено? Звернись до <a href=\""+s.Config.InstaLink+"\">коуча Марії</a>!\n",
+		ChatID:    tu.ID(int64(chatID)),
+		Text:      message,
 		ParseMode: "HTML",
 	}
 	s.MsgChan <- msg
 }
 
-func (s *BotService) SendMessageNow (chatID int, message string) {
-	msg := telego.SendMessageParams{
-		ChatID: tu.ID(int64(chatID)),
-		Text: message,
-		ParseMode: "HTML",
+func (s *BotService) CheckUnsendedMessages() {
+	messages, err := s.Repo.GetAllUnsendedMessages()
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
-	s.MsgChan <- msg
+	costumers, err := s.Repo.GetAllCustumers()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for _, v := range messages {
+		dateTime, err := time.Parse("2006-01-02 15:04", v.DateTime)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		if  dateTime.Compare(time.Now()) < 0 {
+			for _, c := range costumers {
+				if *c.Status != 3 {
+					continue
+				} else {
+					s.SendMessageNow(*c.ChatID, v.Text)
+				}
+			}
+		}
+
+		err = s.Repo.SetStatusSent(v.MessageID)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 }

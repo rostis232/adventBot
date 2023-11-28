@@ -10,7 +10,8 @@
                 <div class="navbar-nav">
                     <a class="nav-link active" aria-current="page" href="/">Обкладинка</a>
                     {{if .Authenticated}}
-                        <a class="nav-link active" href="/logout">Заплановані повідомлення</a>
+                        <a class="nav-link active" href="/journal">Заплановані повідомлення</a>
+                        <a class="nav-link active" href="/journal/add">Запланувати нове</a>
                         <a class="nav-link active" href="/send-page">Відправити повідомлення</a>
                         <a class="nav-link active" href="/logout">Вийти</a>
                     {{else}}

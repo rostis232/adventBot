@@ -1,0 +1,34 @@
+{{template "base" .}}
+
+{{define "content" }}
+<div class="container">
+    <div class="row">
+        <h1 class="mb-3">Журнал повідомлень</h1>
+        <table class="table delete-row-example">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Дата та час</th>
+                    <th scope="col">Текст повідомлення</th>
+                    <th scope="col">Статус відправки</th>
+                    <th scope="col">Дії</th>
+
+                </tr>
+            </thead>
+            <tbody hx-target="closest tr" hx-swap="outerHTML">
+                {{range $id, $value := .Data.messages}}
+                <tr>
+                    <td>{{$id}}</td>
+                    <td>{{$value.DateTime}}</td>
+                    <td>{{$value.Text}}</td>
+                    <td>{{if eq $value.Sent 0}}Не відправлено{{else}}Відправлено{{end}}</td>
+                    <td><button class="btn btn-primary"
+                            hx-get="/journal/{{$value.MessageID}}/edit">Змінити</button> <a href="/journal/{{$value.MessageID}}/delete"><button class="btn btn-danger">Видалити</button></a></td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+{{end}}

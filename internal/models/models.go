@@ -6,3 +6,10 @@ type Costumer struct{
 	Name *string
 	Status *int
 }
+
+type Message struct{
+	MessageID int
+	DateTime string
+	Text string
+	Sent int
+}

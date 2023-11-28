@@ -1,6 +1,8 @@
 package app
 
 import (
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rostis232/adventBot/config"
@@ -57,6 +59,9 @@ func NewApp (config *config.Config) (*App, error) {
 	app.echo.GET("/logout", app.handler.Logout)
 	app.echo.GET("/send-page", app.handler.SendPage)
 	app.echo.POST("/send-page", app.handler.PostSendPage)
+	app.echo.GET("/journal", app.handler.Journal)
+	app.echo.GET("/journal/add", app.handler.JournalAdd)
+	app.echo.POST("/journal/add", app.handler.PostJournalAdd)
 
 	
 
@@ -67,5 +72,6 @@ func (a *App) Run() {
 	// Start server
 	go a.bot.ListenTelegram()
 	go a.bot.SendMessages()
+	go a.bot.CheckUnsendedMessages(5 * time.Second)
 	a.echo.Logger.Fatal(a.echo.Start(":"+a.config.Port))
 }
