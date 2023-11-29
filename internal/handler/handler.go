@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/rostis232/adventBot/internal/models"
@@ -17,6 +18,7 @@ type Service interface{
 	SendMessageNow (message string) error
 	GetAllMessages() ([]models.Message, error)
 	AddMessage(dateTime, message string) error
+	GetAllSecretKeys() ([]models.SecretKey, error)
 }
 
 type Handler struct {
@@ -36,11 +38,11 @@ func (h *Handler) Home(c echo.Context) error {
 	return c.Render(http.StatusOK, "index.html", h.AddDefaultData(nil, c.Request()))
 }
 
-func (h *Handler) Login (c echo.Context) error {
+func (h *Handler) Login(c echo.Context) error {
 	return c.Render(http.StatusOK, "login.page.html", h.AddDefaultData(nil, c.Request()))
 }
 
-func (h *Handler) PostLoginPage (c echo.Context) error {
+func (h *Handler) PostLoginPage(c echo.Context) error {
 	_ = h.Session.SessionManager.RenewToken(c.Request().Context())
 	login := c.FormValue("login")
 	pass := c.FormValue("password")
@@ -57,13 +59,13 @@ func (h *Handler) PostLoginPage (c echo.Context) error {
 	}
 }
 
-func (h *Handler) Logout (c echo.Context) error {
+func (h *Handler) Logout(c echo.Context) error {
 	_ = h.Session.SessionManager.Destroy(c.Request().Context())
 	_ = h.Session.SessionManager.RenewToken(c.Request().Context())
 	return c.Redirect(http.StatusSeeOther, "/login")
 }
 
-func (h *Handler) SendPage (c echo.Context) error {
+func (h *Handler) SendPage(c echo.Context) error {
 	if h.Session.SessionManager.GetString(c.Request().Context(), "user") != "1" {
 		h.Session.SessionManager.Put(c.Request().Context(), "error", "Потрібна авторизація!")
 		return c.Redirect(http.StatusSeeOther, "/login")
@@ -72,7 +74,7 @@ func (h *Handler) SendPage (c echo.Context) error {
 	}
 }
 
-func (h *Handler) PostSendPage (c echo.Context) error {
+func (h *Handler) PostSendPage(c echo.Context) error {
 	if h.Session.SessionManager.GetString(c.Request().Context(), "user") != "1" {
 		h.Session.SessionManager.Put(c.Request().Context(), "error", "Потрібна авторизація!")
 		return c.Redirect(http.StatusSeeOther, "/login")
@@ -93,7 +95,7 @@ func (h *Handler) PostSendPage (c echo.Context) error {
 	}
 }
 
-func(h *Handler) Journal (c echo.Context) error {
+func(h *Handler) Journal(c echo.Context) error {
 	if h.Session.SessionManager.GetString(c.Request().Context(), "user") != "1" {
 		h.Session.SessionManager.Put(c.Request().Context(), "error", "Потрібна авторизація!")
 		return c.Redirect(http.StatusSeeOther, "/login")
@@ -109,7 +111,42 @@ func(h *Handler) Journal (c echo.Context) error {
 	return c.Render(http.StatusOK, "journal.page.html", h.AddDefaultData(&td, c.Request())) 
 }
 
-func(h *Handler) JournalAdd (c echo.Context) error {
+func(h *Handler) Keys(c echo.Context) error {
+	if h.Session.SessionManager.GetString(c.Request().Context(), "user") != "1" {
+		h.Session.SessionManager.Put(c.Request().Context(), "error", "Потрібна авторизація!")
+		return c.Redirect(http.StatusSeeOther, "/login")
+	}
+
+	keys, err := h.Service.GetAllSecretKeys()
+	if err != nil {
+		h.Session.SessionManager.Put(c.Request().Context(), "error", fmt.Sprintf("Помилка отримання переліку кодів: %s", err))
+		return c.Render(http.StatusOK, "keys.page.html", h.AddDefaultData(nil, c.Request())) 
+	}
+
+	tempKeys := []templatedata.Keys{}
+
+	for _, keyDB := range keys {
+		keyStr := strconv.Itoa(*keyDB.SecretKey)
+		keyTemp := templatedata.Keys{
+			SkID: *keyDB.SkID,
+			SecretKey: *keyDB.SecretKey,
+			Link: h.config.TGlink+"?start="+keyStr,
+		}
+		if keyDB.ChatID == nil {
+			keyTemp.ChatID = 0
+		} else {
+			keyTemp.ChatID = *keyDB.ChatID
+		}
+		tempKeys = append(tempKeys, keyTemp)
+	}
+
+	td := templatedata.TemplateData{
+		Data: map[string]interface{}{"keys":tempKeys},
+	}
+	return c.Render(http.StatusOK, "keys.page.html", h.AddDefaultData(&td, c.Request())) 
+}
+
+func(h *Handler) JournalAdd(c echo.Context) error {
 	if h.Session.SessionManager.GetString(c.Request().Context(), "user") != "1" {
 		h.Session.SessionManager.Put(c.Request().Context(), "error", "Потрібна авторизація!")
 		return c.Redirect(http.StatusSeeOther, "/login")
@@ -117,7 +154,7 @@ func(h *Handler) JournalAdd (c echo.Context) error {
 	return c.Render(http.StatusOK, "journal_add.page.html", h.AddDefaultData(&templatedata.TemplateData{}, c.Request()))
 }
 
-func(h *Handler) PostJournalAdd (c echo.Context) error {
+func(h *Handler) PostJournalAdd(c echo.Context) error {
 	if h.Session.SessionManager.GetString(c.Request().Context(), "user") != "1" {
 		h.Session.SessionManager.Put(c.Request().Context(), "error", "Потрібна авторизація!")
 		return c.Redirect(http.StatusSeeOther, "/login")

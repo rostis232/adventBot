@@ -1,0 +1,30 @@
+{{template "base" .}}
+
+{{define "content" }}
+<div class="container">
+    <div class="row">
+        <h1 class="mb-3">Перелік ключів</h1>
+        <table class="table delete-row-example">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Ключ</th>
+                    <th scope="col">Посилання</th>
+                    <th scope="col">Використано</th>
+                </tr>
+            </thead>
+            <tbody hx-target="closest tr" hx-swap="outerHTML">
+                {{range $id, $value := .Data.keys}}
+                <tr>
+                    <td>{{$value.SkID}}</td>
+                    <td>{{$value.SecretKey}}</td>
+                    <td><a href="{{$value.Link}}">{{$value.Link}}</a></td>
+                    <td>{{if eq $value.ChatID 0}}Не використано{{else}}Використано{{end}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+{{end}}

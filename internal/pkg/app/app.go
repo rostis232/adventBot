@@ -62,6 +62,7 @@ func NewApp (config *config.Config) (*App, error) {
 	app.echo.GET("/journal", app.handler.Journal)
 	app.echo.GET("/journal/add", app.handler.JournalAdd)
 	app.echo.POST("/journal/add", app.handler.PostJournalAdd)
+	app.echo.GET("/keys", app.handler.Keys)
 
 	
 

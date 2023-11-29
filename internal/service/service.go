@@ -15,6 +15,7 @@ type Repository interface{
 	GetAllMessages() ([]models.Message, error)
 	AddMessage(dateTime, message string) error
 	GetAllUnsendedMessages() ([]models.Message, error)
+	GetAllSecretKeys() ([]models.SecretKey, error)
 }
 
 type Service struct{
@@ -48,4 +49,8 @@ func (s *Service) GetAllMessages() ([]models.Message, error) {
 
 func (s *Service) AddMessage(dateTime, message string) error {
 	return s.Repo.AddMessage(dateTime, message)
+}
+
+func (s *Service) GetAllSecretKeys() ([]models.SecretKey, error) {
+	return s.Repo.GetAllSecretKeys()
 }

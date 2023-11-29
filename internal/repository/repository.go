@@ -224,3 +224,29 @@ func(r *Repository) SetActivated(chatID int) error {
 	fmt.Println(result.RowsAffected())
 	return nil
 }
+
+func(r *Repository) GetAllSecretKeys() ([]models.SecretKey, error) {
+	query := "SELECT sk_id, secret_key, chat_id FROM secret_keys"
+	rows, err := r.DB.Query(query)
+	if err != nil {
+		return []models.SecretKey{}, err
+	}
+	defer rows.Close()
+
+	var keys []models.SecretKey
+
+	// Читання результатів запиту
+	for rows.Next() {
+		var key models.SecretKey
+		if err := rows.Scan(&key.SkID, &key.SecretKey, &key.ChatID); err != nil {
+			return keys, err
+		}
+		keys = append(keys, key)
+	}
+
+	if err := rows.Err(); err != nil {
+		return keys, err
+	}
+
+	return keys, nil
+}

@@ -13,3 +13,9 @@ type Message struct{
 	Text string
 	Sent int
 }
+
+type SecretKey struct{
+	SkID *int
+	SecretKey *int
+	ChatID *int
+}

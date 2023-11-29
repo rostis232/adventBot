@@ -17,3 +17,10 @@ type TemplateData struct {
 	Authenticated bool
 	Now time.Time
 }
+
+type Keys struct {
+	SkID int
+	SecretKey int
+	Link string
+	ChatID int
+}

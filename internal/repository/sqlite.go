@@ -7,7 +7,7 @@ import (
 
 //write here constants for db entities
 
-func NewSQLiteDB (file string) (*sql.DB, error) {
+func NewSQLiteDB(file string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", "./"+file)
 	if err != nil {
 		return nil, err
