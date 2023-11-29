@@ -130,7 +130,7 @@ func(h *Handler) PostJournalAdd (c echo.Context) error {
 		h.Session.SessionManager.Put(c.Request().Context(), "error", "Всі поля обов'язкові!")
 		return c.Redirect(http.StatusSeeOther, "/journal/add")
 	}
-	if err := h.Service.AddMessage(date+" "+hour+":"+minutes, message); err != nil {
+	if err := h.Service.AddMessage(date+" "+hour+":"+minutes+" "+h.config.MyTime, message); err != nil {
 		h.Session.SessionManager.Put(c.Request().Context(), "error", err)
 		return c.Redirect(http.StatusSeeOther, "/journal/add")
 	}

@@ -33,17 +33,17 @@ func migrate(db *sql.DB) error {
 		PRIMARY KEY("message_id" AUTOINCREMENT)
 	);
 	CREATE TABLE IF NOT EXISTS "costumers" (
-		"costumer_id"	INTEGER UNIQUE,
 		"chat_id"	INTEGER NOT NULL UNIQUE,
 		"name"	TEXT,
-		"status" INTEGER,
-		PRIMARY KEY("costumer_id" AUTOINCREMENT)
+		"is_activated" INT DEFAULT 0,
+		"waiting_for" INT DEFAULT 0,
+		PRIMARY KEY("chat_id")
 	);
 	CREATE TABLE IF NOT EXISTS "secret_keys" (
 		"sk_id"	INTEGER UNIQUE,
 		"secret_key"	INTEGER NOT NULL UNIQUE,
-		"costumer_id"	INTEGER DEFAULT NULL UNIQUE,
-		FOREIGN KEY("costumer_id") REFERENCES "costumers"("costumer_id"),
+		"chat_id"	INTEGER DEFAULT NULL UNIQUE,
+		FOREIGN KEY("chat_id") REFERENCES "costumers"("chat_id"),
 		PRIMARY KEY("sk_id" AUTOINCREMENT)
 	);
 	`

@@ -11,4 +11,5 @@ type Config struct {
 	AppDesc string
 	TGlink string
 	InstaLink string
+	MyTime string
 }

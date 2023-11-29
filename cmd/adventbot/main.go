@@ -24,6 +24,7 @@ func main(){
 		AppDesc: viper.GetString("app.app_desc"),
 		TGlink: viper.GetString("app.tglink"),
 		InstaLink: viper.GetString("app.instalink"),
+		MyTime: viper.GetString("app.time"),
 	  }
 	a, err := app.NewApp(cfg)
 	if err != nil {

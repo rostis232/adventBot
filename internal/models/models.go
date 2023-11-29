@@ -1,10 +1,10 @@
 package models
 
 type Costumer struct{
-	CostumerID *int
 	ChatID *int
 	Name *string
-	Status *int
+	IsActivated *int
+	WaitingFor *int
 }
 
 type Message struct{
