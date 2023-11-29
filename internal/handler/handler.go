@@ -15,10 +15,11 @@ import (
 )
 
 type Service interface{
-	SendMessageNow (message string) error
+	SendMessageNow(message string) error
 	GetAllMessages() ([]models.Message, error)
 	AddMessage(dateTime, message string) error
 	GetAllSecretKeys() ([]models.SecretKey, error)
+	AddNewKeys() error 
 }
 
 type Handler struct {
@@ -144,6 +145,23 @@ func(h *Handler) Keys(c echo.Context) error {
 		Data: map[string]interface{}{"keys":tempKeys},
 	}
 	return c.Render(http.StatusOK, "keys.page.html", h.AddDefaultData(&td, c.Request())) 
+}
+
+func(h *Handler) AddKeys(c echo.Context) error {
+	if h.Session.SessionManager.GetString(c.Request().Context(), "user") != "1" {
+		h.Session.SessionManager.Put(c.Request().Context(), "error", "Потрібна авторизація!")
+		return c.Redirect(http.StatusSeeOther, "/login")
+	}
+
+	err := h.Service.AddNewKeys()
+	if err != nil {
+		h.Session.SessionManager.Put(c.Request().Context(), "error", fmt.Sprintf("Помилка надсилання: %s", err))
+		fmt.Println(err)
+		return c.Redirect(http.StatusSeeOther, "/keys")
+	}
+
+	h.Session.SessionManager.Put(c.Request().Context(), "flash", "Нові ключі додано!")
+	return c.Redirect(http.StatusSeeOther, "/keys")
 }
 
 func(h *Handler) JournalAdd(c echo.Context) error {

@@ -250,3 +250,12 @@ func(r *Repository) GetAllSecretKeys() ([]models.SecretKey, error) {
 
 	return keys, nil
 }
+
+func(r *Repository) AddKey(key int) error {
+	query := "INSERT INTO secret_keys (secret_key) VALUES (?)"
+	_, err := r.DB.Exec(query, key)
+	if err != nil {
+		return err
+	}
+	return nil
+}

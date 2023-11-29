@@ -1,6 +1,9 @@
 package service
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/rostis232/adventBot/internal/models"
 	"github.com/rostis232/adventBot/internal/telegram"
 )
@@ -16,6 +19,7 @@ type Repository interface{
 	AddMessage(dateTime, message string) error
 	GetAllUnsendedMessages() ([]models.Message, error)
 	GetAllSecretKeys() ([]models.SecretKey, error)
+	AddKey(key int) error
 }
 
 type Service struct{
@@ -53,4 +57,10 @@ func (s *Service) AddMessage(dateTime, message string) error {
 
 func (s *Service) GetAllSecretKeys() ([]models.SecretKey, error) {
 	return s.Repo.GetAllSecretKeys()
+}
+
+func (s *Service) AddNewKeys() error {
+	now := time.Now()
+	fmt.Println(now.Unix())
+	return s.Repo.AddKey(int(now.Unix()))
 }
