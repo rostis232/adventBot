@@ -1,0 +1,14 @@
+db:
+  dbname: "sqlite3.db"
+  redis: "127.0.0.1:6380"
+
+app:
+  port: "8080"
+  tg_secretkey: "tg-api-key"
+  admin_login: "admin"
+  admin_pass: "pass"
+  app_name: "Title"
+  app_desc: "Description"
+  tglink: "https://t.me/..."
+  instalink: "https://www.instagram.com/..."
+  time: "+0200"
