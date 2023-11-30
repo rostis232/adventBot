@@ -64,3 +64,7 @@ func (s *Service) AddNewKeys() error {
 	fmt.Println(now.Unix())
 	return s.Repo.AddKey(int(now.Unix()))
 }
+
+func (s *Service) GetAllCustumers() ([]models.Costumer, error) {
+	return s.Repo.GetAllCustumers()
+}

@@ -1,0 +1,29 @@
+{{template "base" .}}
+
+{{define "content" }}
+<div class="container">
+    <div class="row">
+        <h1 class="mb-3">Перелік користувачів</h1>
+        <table class="table delete-row-example">
+            <thead>
+                <tr>
+                    <th scope="col">Chat ID</th>
+                    <th scope="col">Ім'я</th>
+                    <th scope="col">Активовано</th>
+                    <th scope="col">Очікує</th>
+                </tr>
+            </thead>
+            <tbody hx-target="closest tr" hx-swap="outerHTML">
+                {{range $id, $value := .Data.costumers}}
+                <tr>
+                    <td>{{$value.ChatID}}</td>
+                    <td>{{$value.Name}}</td>
+                    <td>{{$value.IsActivated}}</td>
+                    <td>{{$value.WaitingFor}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{end}}

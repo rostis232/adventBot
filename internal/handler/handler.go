@@ -20,6 +20,7 @@ type Service interface{
 	AddMessage(dateTime, message string) error
 	GetAllSecretKeys() ([]models.SecretKey, error)
 	AddNewKeys() error 
+	GetAllCustumers() ([]models.Costumer, error)
 }
 
 type Handler struct {
@@ -211,4 +212,22 @@ func(h *Handler) AddDefaultData(td *templatedata.TemplateData, r *http.Request) 
 
 func (h *Handler) IsAuthenticated(r *http.Request) bool {
 	return h.Session.SessionManager.Exists(r.Context(), "user")
+}
+
+func (h *Handler) GetAllCustumers(c echo.Context) error {
+	if h.Session.SessionManager.GetString(c.Request().Context(), "user") != "1" {
+		h.Session.SessionManager.Put(c.Request().Context(), "error", "Потрібна авторизація!")
+		return c.Redirect(http.StatusSeeOther, "/login")
+	}
+
+	costumers, err := h.Service.GetAllCustumers()
+	if err != nil {
+		h.Session.SessionManager.Put(c.Request().Context(), "error", fmt.Sprintf("Помилка отримання переліку користувачів: %s", err))
+		return c.Render(http.StatusOK, "costumers.page.html", h.AddDefaultData(nil, c.Request())) 
+	}
+
+	td := templatedata.TemplateData{
+		Data: map[string]interface{}{"costumers":costumers},
+	}
+	return c.Render(http.StatusOK, "costumers.page.html", h.AddDefaultData(&td, c.Request())) 
 }
