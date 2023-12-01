@@ -75,6 +75,6 @@ func (a *App) Run() {
 	// Start server
 	go a.bot.ListenTelegram()
 	go a.bot.SendMessages()
-	go a.bot.CheckUnsendedMessages(5 * time.Second)
+	go a.bot.CheckUnsendedMessages(5 * time.Minute)
 	a.echo.Logger.Fatal(a.echo.Start(":"+a.config.Port))
 }
