@@ -322,7 +322,7 @@ func (s *BotService) ExpectingName(costumer models.Costumer, received *telego.Me
 	if costumer.IsActivated == nil || *costumer.IsActivated == 0 {
 		msg := telego.SendMessageParams{
 			ChatID:    tu.ID(received.Chat.ID),
-			Text:      "Радий знайомству.\nЩоб продовжити мені потрібно отримати код. Отримати його можна у <a href=\""+s.Config.InstaLink+"\">Марії</a>.\n",
+			Text:      "Радий знайомству.\nЩоб продовжити мені потрібно отримати код. Отримати його можна у <a href=\"" + s.Config.InstaLink + "\">Марії</a>.\n",
 			ParseMode: "HTML",
 		}
 		s.MsgChan <- msg
@@ -388,17 +388,16 @@ func (s *BotService) CheckUnsendedMessages() {
 
 		if dateTime.Compare(time.Now()) < 0 {
 			for _, c := range costumers {
-				fmt.Println("Відправляю",v.Text,*c.Name)
+				fmt.Println("Відправляю", v.MessageID)
 				s.SendMessageNow(*c.ChatID, v.Text)
 			}
 
 			err = s.Repo.SetStatusSent(v.MessageID)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 		}
 
-		
 	}
 }
