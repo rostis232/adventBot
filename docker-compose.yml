@@ -2,7 +2,6 @@ version: '3'
 
 services:
 
-  #  start Redis, and ensure that data is stored to a mounted volume
   redis:
     image: 'redis:alpine'
     ports:
@@ -10,3 +9,18 @@ services:
     restart: always
     volumes:
       - ./db-data/redis/:/data
+
+  bot:
+    build:
+      context: .
+      dockerfile: ./bot.dockerfile
+    restart: always
+    ports:
+      - "8083:8083"
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      - redis
+    volumes:
+      - ./sqldb/:/app/sqldb
