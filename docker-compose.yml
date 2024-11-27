@@ -7,20 +7,3 @@ services:
     ports:
       - "6380:6379"
     restart: always
-    volumes:
-      - ./db-data/redis/:/data
-
-  bot:
-    build:
-      context: .
-      dockerfile: ./bot.dockerfile
-    restart: always
-    ports:
-      - "8083:8083"
-    deploy:
-      mode: replicated
-      replicas: 1
-    depends_on:
-      - redis
-    volumes:
-      - ./sqldb/:/app/sqldb
